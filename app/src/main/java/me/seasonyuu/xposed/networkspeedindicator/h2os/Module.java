@@ -60,31 +60,45 @@ public final class Module implements IXposedHookLoadPackage {
 					lpparam.classLoader);
 
 			// we hook this method to follow alpha changes in kitkat
-            Method setAlpha = XposedHelpers.findMethodBestMatch(cClock, "setAlpha", Float.class);
-            XposedBridge.hookMethod(setAlpha, new XC_MethodHook() {
-                @SuppressLint("NewApi")
-                @Override
-                protected final void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                    try {
-                        if (param.thisObject != getClock())
-                            return;
+//            Method setAlpha = XposedHelpers.findMethodBestMatch(cClock, "setAlpha", Float.class);
+//            XposedBridge.hookMethod(setAlpha, new XC_MethodHook() {
+//                @SuppressLint("NewApi")
+//                @Override
+//                protected final void afterHookedMethod(final MethodHookParam param) throws Throwable {
+//                    try {
+//                        if (param.thisObject != getClock())
+//                            return;
+//
+//                        float targetAlpha = 1;
+//                        if (trafficView != null) {
+//                            if (statusIcons != null) {
+//                                targetAlpha = statusIcons.getAlpha();
+//                            } else if (clock != null) {
+//                                targetAlpha = clock.getAlpha();
+//                            }
+//                            if (trafficView.getAlpha() != targetAlpha)
+//                                trafficView.setAlpha(targetAlpha);
+//                        }
+//                    } catch (Exception e) {
+//                        Log.e(TAG, "afterHookedMethod (setAlpha) failed: ", e);
+//                        throw e;
+//                    }
+//                }
+//            });
+			XposedHelpers.findAndHookMethod(
+					"com.android.systemui.statusbar.phone.PhoneStatusBarTransitions", lpparam.classLoader,
+					"applyMode", int.class, boolean.class, new XC_MethodHook() {
+						@Override
+						protected void afterHookedMethod(MethodHookParam param) {
+							final float targetAlpha = (Float) XposedHelpers.callMethod(
+									param.thisObject, "getNonBatteryClockAlphaFor", (Integer) param.args[0]);
 
-                        float targetAlpha = 1;
-                        if (trafficView != null) {
-                            if (statusIcons != null) {
-                                targetAlpha = statusIcons.getAlpha();
-                            } else if (clock != null) {
-                                targetAlpha = clock.getAlpha();
-                            }
-                            if (trafficView.getAlpha() != targetAlpha)
-                                trafficView.setAlpha(targetAlpha);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "afterHookedMethod (setAlpha) failed: ", e);
-                        throw e;
-                    }
-                }
-            });
+							if (trafficView != null) {
+								if (trafficView.getAlpha() != targetAlpha)
+									trafficView.setAlpha(targetAlpha);
+							}
+						}
+					});
 
 			if (Build.VERSION.SDK_INT < 26) {
 				XposedHelpers.findAndHookMethod(XposedHelpers.findClass("com.android.systemui.statusbar.phone.PhoneStatusBar",
@@ -256,6 +270,7 @@ public final class Module implements IXposedHookLoadPackage {
 		switch (Build.VERSION.SDK_INT) {
 			case 26:
 			case 27:
+			case 28:
 				iconTintClassName = "com.android.systemui.statusbar.phone.DarkIconDispatcherImpl";
 				methodName = "applyIconTint";
 				break;
@@ -285,7 +300,6 @@ public final class Module implements IXposedHookLoadPackage {
 					lpparam.classLoader));
 			Log.w(TAG, "handleLoadPackage failure ignored: ", e);
 		}
-
 	}
 
 	private void hookClockColor(final Class clazz) {
