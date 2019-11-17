@@ -48,43 +48,43 @@ public class Log {
 	}
 
 	private static final void writeToFile(final char level, final String tag, final String msg, final Throwable thr) {
-		try {
-			if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
-				return;
-			if (pw == null || pw.checkError()) {
-				try {
-					pw.close();
-				} catch (Exception ignore) {
-				}
-
-				String foldername = Environment.getExternalStorageDirectory() + "/NetworkSpeedIndicator";
-				File folder = new File(foldername);
-				if (!folder.exists())
-					folder.mkdir();
-				if (!folder.isDirectory())
-					return;
-
-				String filename = foldername + "/" + sdfDate.format(new Date()) + ".log";
-				pw = new PrintWriter(new FileWriter(filename, true));
-			}
-			pw.print(level);
-			pw.print('/');
-			pw.print(sdfTime.format(new Date()));
-			pw.print('/');
-			pw.print(tag);
-			pw.print('/');
-			pw.println(msg);
-			if (thr != null)
-				thr.printStackTrace(pw);
-			pw.flush();
-		} catch (Exception e) {
-			try {
-				pw.close();
-			} catch (Exception ignore) {
-			}
-			pw = null;
-			android.util.Log.e(TAG, "Stack trace: ", e);
-		}
+//		try {
+//			if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+//				return;
+//			if (pw == null || pw.checkError()) {
+//				try {
+//					pw.close();
+//				} catch (Exception ignore) {
+//				}
+//
+//				String foldername = Environment.getExternalStorageDirectory() + "/NetworkSpeedIndicator";
+//				File folder = new File(foldername);
+//				if (!folder.exists())
+//					folder.mkdir();
+//				if (!folder.isDirectory())
+//					return;
+//
+//				String filename = foldername + "/" + sdfDate.format(new Date()) + ".log";
+//				pw = new PrintWriter(new FileWriter(filename, true));
+//			}
+//			pw.print(level);
+//			pw.print('/');
+//			pw.print(sdfTime.format(new Date()));
+//			pw.print('/');
+//			pw.print(tag);
+//			pw.print('/');
+//			pw.println(msg);
+//			if (thr != null)
+//				thr.printStackTrace(pw);
+//			pw.flush();
+//		} catch (Exception e) {
+//			try {
+//				pw.close();
+//			} catch (Exception ignore) {
+//			}
+//			pw = null;
+//			android.util.Log.e(TAG, "Stack trace: ", e);
+//		}
 	}
 
 	public static final void d(final String tag, final Object... msg) {
